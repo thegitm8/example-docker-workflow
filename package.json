@@ -1,0 +1,50 @@
+{
+  "name": "example-docker-workflow",
+  "version": "0.1.0",
+  "description": "Production and development workflow for containerized units.",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thegitm8/example-docker-workflow.git"
+  },
+  "scripts": {
+    "start": "npm run --silent docker:prod:start && npm run --silent docker:prod:logs || npm run docker:prod:prepare",
+    "start:dev": "npm run --silent docker:dev:start && npm run --silent docker:dev:logs || npm run docker:dev:prepare",
+    "stop": "npm run --silent docker:prod:stop",
+    "stop:dev": "npm run --silent docker:dev:stop",
+    "clear": "npm run --silent docker:prod:clear",
+    "clear:dev": "npm run --silent docker:dev:clear",
+    "clear:all": "npm run --silent docker:prod:clear; npm run --silent docker:dev:clear",
+    "DOCKER:PROD": "echo \"### Docker production commands. ###\"",
+    "docker:prod:start": "docker start docker-wf-example-prod",
+    "docker:prod:stop": "docker stop docker-wf-example-prod || exit 0",
+    "docker:prod:clear": "npm run --silent docker:prod:stop; npm run --silent docker:prod:rmi; npm run --silent docker:prod:rm",
+    "docker:prod:rmi": "docker rmi docker-wf-example-prod-image -f || exit 0",
+    "docker:prod:rm": "docker rm -f docker-wf-example-prod || exit 0",
+    "docker:prod:logs": "docker logs -f docker-wf-example-prod",
+    "docker:prod:prepare": "npm run --silent docker:prod:build; npm run --silent docker:prod:run; npm run --silent docker:prod:logs",
+    "docker:prod:run": "docker run -d --name docker-wf-example-prod -p 9002:9002 docker-wf-example-prod-image",
+    "docker:prod:build": "docker build -t docker-wf-example-prod-image -f _docker/prod.dockerfile .",
+    "DOCKER:DEV": "echo \"### Docker development commands. ###\"",
+    "docker:dev:start": "docker start docker-wf-example-dev",
+    "docker:dev:stop": "docker stop docker-wf-example-dev || exit 0",
+    "docker:dev:clear": "npm run --silent docker:dev:stop; npm run --silent docker:dev:rmi; npm run --silent docker:dev:rm",
+    "docker:dev:rmi": "docker rmi docker-wf-example-dev-image -f || exit 0",
+    "docker:dev:rm": "docker rm -f docker-wf-example-dev || exit 0",
+    "docker:dev:logs": "docker logs -f docker-wf-example-dev",
+    "docker:dev:prepare": "npm run --silent docker:dev:build; npm --silent run docker:dev:run; npm run --silent docker:dev:logs",
+    "docker:dev:run": "docker run -d --name docker-wf-example-dev -p 9003:9002 -v $(pwd):/opt/app docker-wf-example-dev-image",
+    "docker:dev:build": "npm run docker:prod:build; docker build -t docker-wf-example-dev-image -f _docker/dev.dockerfile ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^0.35.1",
+    "influx": "^5.0.0-alpha.4",
+    "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.11.0"
+  }
+}
